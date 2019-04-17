@@ -4,7 +4,7 @@ import re
 import csv
 
 
-def split(splitLines):
+def split(splitLine):
     '''
     CONVERT
 
@@ -22,26 +22,38 @@ def split(splitLines):
         "n." : "noun",
         "v." : "verb",
         "adv." : "adverb",
-        "adj.": "adjective"
+        "ad.": "adjective",
+        "adj.": "adjective",
+        "interj.": "interjection",
+        "inter.": "interjection",
+        "conj.": "conjunction",
+        "prep.": "preposition",
+        "adv. & adj.": "adverb & adjective"
     }
-    for splitLine in splitLines:
-        posList = ["n", "v" , "adj", "adv"]
-        regexStr = "(" + ("|").join([ f"\\s{pos}[.]\\s" for pos in posList]) + ")"
-        # print("regexStr")
-        # print(regexStr)
-        [word, pos, meaning] = re.split(regexStr, splitLine)
-        print({
-            "word" : word,
-            "pos" : posMap[pos.strip()],
-            "meaning": meaning
-        })
+    posList = ["adv[.]\\s[&]\\sadj", "prep", "inter", "interj", "conj", "n", "v" , "ad", "adj", "adv"]
+    regexStr = "(" + ("|").join([ f"\\s{pos}[.]\\s" for pos in posList]) + ")"
+    # print("regexStr")
+    # print(regexStr)
+    # print("splitLine")
+    # print(splitLine)
+    try:
+        result = re.split(regexStr, splitLine)
+        [word, pos, meaning] = result
+        # print({
+        #     "word" : word,
+        #     "pos" : posMap[pos.strip()],
+        #     "meaning": meaning
+        # })
         # exit()
         return {
             "word" : word,
             "pos" : posMap[pos.strip()],
             "meaning": meaning
         }
-
+    except:
+        print("###failed###")
+        print(result)
+        return None
 
 def main():
     # init reader object
@@ -60,10 +72,11 @@ def main():
         # iterate through pages to extract text
         for pageNo in range(numPages):
             pageText = grePdfReader.getPage(pageNo).extractText()
-            splitLines = [ line.strip() for line in re.split(r"\d+",pageText)[2:-1] ]
+            splitLines = [ line.strip() for line in re.split(r"[\n]\d+[\n]",pageText)[2:-1] ]
             # print(splitLines)
-            splitData = split(splitLines)
-            writer.writerow(splitData)
+            for splitLine in splitLines:
+                splitData = split(splitLine)
+                if splitData is not None: writer.writerow(splitData)
 
 if __name__ == "__main__":
     main()
