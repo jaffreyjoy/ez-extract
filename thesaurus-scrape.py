@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-from tqdm import tqdm
 
 import csv
 import urllib.request
