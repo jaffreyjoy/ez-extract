@@ -11,7 +11,7 @@ def scrape(writer, url, word, word_class_name):
             html_doc = f.read().decode()
             soup = BeautifulSoup(html_doc, 'html.parser')
             nodesList = soup.find_all("a", class_ = word_class_name)
-            if(nodesList is not None):
+            if(nodesList != []):
                 similarWords = [ node.string for node in nodesList ]
                 print(f"similar: {similarWords}")
                 for similarWord in similarWords:
